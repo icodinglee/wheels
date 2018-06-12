@@ -2,6 +2,8 @@
  * @desc redux 内部简单实现
  */
 
+//   <-----------------------一些公用方法------------------------->
+
 /**
  * 
  * @param {*} obj 待检测类型
@@ -51,7 +53,6 @@ function deepClone(data) {
         return data;
     }
 }
-
 
 //   <-----------------------创建reducer------------------------->
 
@@ -140,16 +141,23 @@ const validateAction = action => {
     }
 }
 
-const createStore = reducer => {
+// 创建reducer 并添加中间件
+const createStore = (reducer, middleware) => {
     let state = undefined;
     const subscribers = [];
-    const store = {
+    const coreDispatch = action => {
+        validateAction(action);
+        state = reducer(state, action);
+        subscribers.forEach(handler => handler());
+    };
+    const getState = () => state;
+    let store = {
         dispatch: action => {
             validateAction(action);
             state = reducer(state, action);
             subscribers.forEach(handler => handler());  // 执行订阅方法
         },
-        getState: ()=> state,
+        getState,
         subscribe: handler => {
             subscribers.push(handler);
             return ()=> {   // 在这里可以取消订阅
@@ -160,9 +168,50 @@ const createStore = reducer => {
             }
         }
     };
-    store.dispatch({type: '@@redux/INIT'});
+    if (middleware) {
+        const dispatch = action => store.dispatch(action);
+        store.dispatch = middleware({
+          dispatch,
+          getState
+        })(coreDispatch);
+      }
+    coreDispatch({type: '@@redux/INIT'});
     return store;
 }
 
+// 创建一个延时中间件
+const delayMiddleware = () => next => action => {
+    setTimeout(()=>{
+        next(action);
+    }, 1000)
+}
 
-const store = createStore(reducer);
+// 创建一个日志打印中间件
+const loggingMiddleware = ({getState}) => next => action => {
+    console.log('before', getState());
+    console.info('action', action);
+    const result = next(action);
+    console.info('after', getState());
+    return result;
+}
+
+// 创建中间件合成器
+const applyMiddleware = (...middlewares) => store => {
+    if(middlewares.length === 0){
+        return dispatch => dispatch
+    }
+    if(middlewares.length === 1){
+        return middlewares[0]
+    }
+    const boundMiddlewares = middlewares.map(middleware=> 
+        middleware(store)
+    );
+    return boundMiddlewares.reduce((a, b)=>
+        next => a(b(next)) 
+    )
+}
+
+const store = createStore(reducer, applyMiddleware(
+    delayMiddleware,
+    loggingMiddleware
+));

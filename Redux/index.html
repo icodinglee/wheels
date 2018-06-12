@@ -14,7 +14,7 @@
     <script type="text/babel">
 
       //////////////////////////////////////////////
-      ////---redux组件- Provider && Connect-////////
+      ////---redux组件- Provider && Connect ////////
       /////////////////////////////////////////////
 
       /**
@@ -41,57 +41,54 @@
        * */
 
       const connect = (
-        mapStateToProps = () => ({}),
-        mapDispatchToProps = () => ({})
+          mapStateToProps = () => ({}),
+          mapDispatchToProps = () => ({})
       ) => Component => {
-        class Connected extends React.Component {
+          class Connected extends React.Component {
 
-          onStoreOrPropsChange(props) {
-            const { store } = this.context;
-            const state = store.getState();
-            const stateProps = mapStateToProps(state, props);   // 将所有的state值转化为props， 在各个组件中再去取相应的值
-            console.log(mapDispatchToProps);
-            const dispatchProps = mapDispatchToProps(store.dispatch, props);  // 
-            console.log(stateProps, dispatchProps);
-            this.setState({
-              ...stateProps,
-              ...dispatchProps
-            })
+            onStoreOrPropsChange(props) {
+              const { store } = this.context;
+              const state = store.getState();
+              const stateProps = mapStateToProps(state, props);   // 将所有的store中的相关state取出s， 再以props的形式注入到各个组件中
+              const dispatchProps = mapDispatchToProps(store.dispatch, props);  // 把store中的dispatch方法注入到自定义方法中，再把这些方法以props 的形式传入到组件中去
+              this.setState({
+                ...stateProps,
+                ...dispatchProps
+              })
+            }
+            
+            componentWillMount(){
+              const { store } = this.context;
+              this.onStoreOrPropsChange(this.props);
+              this.unsubscribe = store.subscribe(() => this.onStoreOrPropsChange(this.props));
+            }
+
+            componentWillReceiveProps(nextProps){
+              this.onStoreOrPropsChange(nextProps);
+            }
+
+            componentWillUnmount() {
+              this.unsubscribe()
+            }
+
+            render(){
+              return <Component {...this.props} {...this.state} />   // 方法 和状态值在这里以props的形式注入
+            }
           }
-          
-          componentWillMount(){
-            const { store } = this.context;
-            console.log(this.context);
-            this.onStoreOrPropsChange(this.props);
-            this.unsubscribe = store.subscribe(() => this.onStoreOrPropsChange(this.props));
-          }
 
-          componentWillReceiveProps(nextProps){
-            this.onStoreOrPropsChange(nextProps);
-          }
+          Connected.contextTypes   = {
+            store: PropTypes.object
+          };
 
-          componentWillUnmount() {
-            this.unsubscribe()
-          }
-
-          render(){
-            return <Component {...this.props} {...this.state} />
-          }
-        }
-
-        Connected.contextTypes   = {
-          store: PropTypes.object
-        };
-
-        return Connected;
+          return Connected;
       }
-
-
-
-
-
-
-       /////////////////////////
+//
+//
+//
+//
+//
+//
+       //////////////////////////
        ////---UI组件--//////////
        ///////////////////////
 
