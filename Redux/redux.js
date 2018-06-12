@@ -1,4 +1,8 @@
 /**
+ * @desc redux 内部简单实现
+ */
+
+/**
  * 
  * @param {*} obj 待检测类型
  * @desc 类型检测
@@ -143,12 +147,12 @@ const createStore = reducer => {
         dispatch: action => {
             validateAction(action);
             state = reducer(state, action);
-            subscribers.forEach(handler => handler());
+            subscribers.forEach(handler => handler());  // 执行订阅方法
         },
         getState: ()=> state,
         subscribe: handler => {
             subscribers.push(handler);
-            return ()=> {
+            return ()=> {   // 在这里可以取消订阅
                 const index = subscribers.indexOf(handler);
                 if(index > 0) {
                     subscribers.splice(index, 1);

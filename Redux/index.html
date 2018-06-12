@@ -6,12 +6,96 @@
     <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+    <script src="https://unpkg.com/prop-types@15.6/prop-types.js"></script>
   </head>
   <body>
     <div id="root"></div>
     <script src="./redux.js"></script>
     <script type="text/babel">
 
+      //////////////////////////////////////////////
+      ////---redux组件- Provider && Connect-////////
+      /////////////////////////////////////////////
+
+      /**
+       * @desc 构造provider  Provider组件使用React 的context 属性，把store中的数据传递到它下面的每一层级去
+       * */
+      class Provider extends React.Component {
+          getChildContext() {
+              return {
+                store: this.props.store
+              };
+          }
+          render() {
+              return this.props.children;
+           }
+      }
+          
+      Provider.childContextTypes   = {
+          store: PropTypes.object
+      };
+      
+       /**
+       * @desc 构造Connect，由于context属性在未来可能被废弃，因此我们需要把放在context中的数据放在props中，
+       * 通过props的形式传入到组件中去,在未来context被废弃时,只需要修改redux内部代码即可，用户不必修改他们自己的代码
+       * */
+
+      const connect = (
+        mapStateToProps = () => ({}),
+        mapDispatchToProps = () => ({})
+      ) => Component => {
+        class Connected extends React.Component {
+
+          onStoreOrPropsChange(props) {
+            const { store } = this.context;
+            const state = store.getState();
+            const stateProps = mapStateToProps(state, props);   // 将所有的state值转化为props， 在各个组件中再去取相应的值
+            console.log(mapDispatchToProps);
+            const dispatchProps = mapDispatchToProps(store.dispatch, props);  // 
+            console.log(stateProps, dispatchProps);
+            this.setState({
+              ...stateProps,
+              ...dispatchProps
+            })
+          }
+          
+          componentWillMount(){
+            const { store } = this.context;
+            console.log(this.context);
+            this.onStoreOrPropsChange(this.props);
+            this.unsubscribe = store.subscribe(() => this.onStoreOrPropsChange(this.props));
+          }
+
+          componentWillReceiveProps(nextProps){
+            this.onStoreOrPropsChange(nextProps);
+          }
+
+          componentWillUnmount() {
+            this.unsubscribe()
+          }
+
+          render(){
+            return <Component {...this.props} {...this.state} />
+          }
+        }
+
+        Connected.contextTypes   = {
+          store: PropTypes.object
+        };
+
+        return Connected;
+      }
+
+
+
+
+
+
+       /////////////////////////
+       ////---UI组件--//////////
+       ///////////////////////
+
+      // 编辑器组件
       const NoteEditor = ({note, onChangeNote, onCloseNote}) => (
         <div>
           <div>
@@ -30,6 +114,7 @@
         </div>
       );
       
+      // 单个列
       const NoteTitle = ({note}) => {
         const title = note.content.split('\n')[0].replace(/^\s+|\s+$/g, '');
         if (title === '') {
@@ -46,6 +131,7 @@
         </li>
       );
       
+      // 列表
       const NoteList = ({notes, onOpenNote}) => (
         <ul className="note-list">
           {
@@ -90,60 +176,40 @@
         </div>
       );
 
-      class NoteAppContainer extends React.Component {
-        constructor(props) {
-            super(props);
-            this.state = props.store.getState();
-        }
-        componentWillMount() {
-            this.unsubscribe = this.props.store.subscribe(()=> 
-                this.setState(this.props.store.getState)
-            );
-        }
-        componentWillUnmount() {
-            this.unsubscribe()
-        }
-        onAddNote() {
-            this.props.store.dispatch({
-                type: CREATE_NOTE
-            })
-        }
-        onChangeNote(id, content) {
-           console.log(this);
-            this.props.store.dispatch({
-                type: UPDATE_NOTE,
-                id,
-                content
-            })
-        }
-        onOpenNote(id) {
-            this.props.store.dispatch({
-                type: OPEN_NOTE,
-                id
-            })
-        }
-        onCloseNote() {         
-            this.props.store.dispatch({
-                type: CLOSE_NOTE
-            })
-        }
-        render(){
-          return (
-                <NoteApp 
-                    {...this.state}
-                    onAddNote={this.onAddNote.bind(this)}
-                    onChangeNote={this.onChangeNote.bind(this)}
-                    onOpenNote={this.onOpenNote.bind(this)}
-                    onCloseNote={this.onCloseNote.bind(this)}
-                />
-          ) 
-        }
-      }
+      
+      const _mapStateToProps = state => ({
+          notes: state.notes,
+          openNoteId: state.openNoteId
+      });
 
+      const _mapDispatchToProps = dispatch => ({
+          onAddNote: () => dispatch({
+            type: CREATE_NOTE
+          }),
+          onChangeNote: (id, content) => dispatch({
+            type: UPDATE_NOTE,
+            id,
+            content
+          }),
+          onOpenNote: id => dispatch({
+            type: OPEN_NOTE,
+            id
+          }),
+          onCloseNote: () => dispatch({
+            type: CLOSE_NOTE
+          })
+      });
+      
+      const NoteAppContainer = connect(
+          _mapStateToProps,
+          _mapDispatchToProps
+      )(NoteApp);
 
       const renderApp = () => {
             ReactDOM.render(
-                <NoteAppContainer store={store} />,
+                <Provider store={store}>
+                  <NoteAppContainer/>
+                </Provider>,
                 document.getElementById('root')
             )
       }

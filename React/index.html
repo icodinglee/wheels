@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Hello World</title>
+    <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+
+        const initialState = {
+            nextNodeId: 1,
+            notes: {}
+        }
+        window.state = initialState;
+        
+        const onAddNote = () =>{
+            const id = window.state.nextNodeId;
+            window.state.notes[id] = {
+                id: '',
+                content: ''
+            }
+            window.state.nextNodeId++;
+            renderApp();
+        }
+
+        const NodeApp = ({Notes}) => (
+            <div>
+                <ul>
+                    {
+                        Object.keys(notes).map(id =>{
+                            <li className="note-list-item">{id}</li>
+                        })
+                    }
+                </ul>
+                <button className="edit-button" onClick={onAddNote}>new note</button>
+            </div>
+        )
+
+        const renderApp = () => {
+            ReactDOM.render(
+                <NodeApp notes={window.state.notes} />,
+                document.getElementById('root')
+            )
+        }
+     // <------------------------------split-line------------------------>
+    //   const content = <h1>Hello, world!</h1>;
+    //   ReactDOM.render(
+    //     content,
+    //     document.getElementById('root')
+    //   );
+
+    </script>
+  </body>
+</html>
