@@ -37,7 +37,7 @@
       
        /**
        * @desc 构造Connect，由于context属性在未来可能被废弃，因此我们需要把放在context中的数据放在props中，
-       * 通过props的形式传入到组件中去,在未来context被废弃时,只需要修改redux内部代码即可，用户不必修改他们自己的代码
+       * 通过props的形式传入到组件中去,在未来context被废弃时,只需要修改redux内部代码即可，用户不必再修改他们自己的代码
        * */
 
       const connect = (
@@ -82,15 +82,12 @@
 
           return Connected;
       }
-//
-//
-//
-//
-//
-//
-       //////////////////////////
-       ////---UI组件--//////////
-       ///////////////////////
+
+
+
+       ////////////////////////////////////////////////
+       //////////////////---UI组件--///////////////////
+       ////////////////////////////////////////////////
 
       // 编辑器组件
       const NoteEditor = ({note, onChangeNote, onCloseNote}) => (
@@ -144,7 +141,7 @@
       );
       
       const NoteApp = ({
-        notes, openNoteId, onAddNote, onChangeNote,
+        notes, openNoteId, isLoading, onAddNote, onChangeNote,
         onOpenNote, onCloseNote
       }) => (
         <div>
@@ -164,8 +161,9 @@
                   <button
                     className="editor-button"
                     onClick={onAddNote}
+                    disabled={isLoading}
                   >
-                    New Note
+                     { isLoading ? 'isLoading...' : 'New Note' }
                   </button>
                 }
               </div>
@@ -176,12 +174,13 @@
       
       const _mapStateToProps = state => ({
           notes: state.notes,
+          isLoading: state.isLoading,
           openNoteId: state.openNoteId
       });
 
       const _mapDispatchToProps = dispatch => ({
-          onAddNote: () => dispatch({
-            type: CREATE_NOTE
+          onCloseNote: () => dispatch({
+            type: CLOSE_NOTE
           }),
           onChangeNote: (id, content) => dispatch({
             type: UPDATE_NOTE,
@@ -192,9 +191,20 @@
             type: OPEN_NOTE,
             id
           }),
-          onCloseNote: () => dispatch({
-            type: CLOSE_NOTE
-          })
+          onAddNote: () => dispatch(
+              ({dispatch}) => {
+                  dispatch({type: CREATE_NOTE});
+
+                  const fakerURL = 'https://api.github.com/users/octocat/orgs'; // 模拟网址
+
+                  fetch(fakerURL).then(e=>{  // 异步请求拿到数据，在进行dispatch 的处理
+                    dispatch({
+                      type: CREATE_NOTE,
+                      id: (new Date()).getTime()
+                    })
+                  })
+              }
+          )
       });
       
       const NoteAppContainer = connect(

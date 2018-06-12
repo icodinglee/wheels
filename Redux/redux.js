@@ -54,6 +54,8 @@ function deepClone(data) {
     }
 }
 
+
+
 //   <-----------------------创建reducer------------------------->
 
 const CREATE_NOTE = 'CREATE_NOTE';
@@ -62,31 +64,30 @@ const OPEN_NOTE = 'OPEN_NOTE';
 const CLOSE_NOTE = 'CLOSE_NOTE';
 
 // 初始数据
-const InitialState = {
-  nextNoteId: 1,
+const initialState = {
+  isLoading: false,
   notes: {},
   openNoteId: null
 };
 
-// 根据传来的action,reducer进行相关操作
-const initialState = {
-    nextNoteId: 1,
-    notes: {},
-    openNoteId: null
-};
-  
 const reducer = (state = initialState, action) => {
     switch (action.type) {
         case CREATE_NOTE: {
-            const id = state.nextNoteId;
+            const id = action.id;
+            if(!id){
+                return {
+                    ...state,
+                    isLoading: true
+                }
+            }
             const newNote = {
                 id,
                 content: ''
             };
             return {
                 ...state,
-                nextNoteId: id + 1,
                 openNoteId: id,
+                isLoading: false,
                 notes: {
                     ...state.notes,
                     [id]: newNote
@@ -146,14 +147,14 @@ const createStore = (reducer, middleware) => {
     let state = undefined;
     const subscribers = [];
     const coreDispatch = action => {
-        validateAction(action);
+        validateAction(action); // 类型检测
         state = reducer(state, action);
         subscribers.forEach(handler => handler());
     };
     const getState = () => state;
     let store = {
         dispatch: action => {
-            validateAction(action);
+            validateAction(action); 
             state = reducer(state, action);
             subscribers.forEach(handler => handler());  // 执行订阅方法
         },
@@ -211,7 +212,16 @@ const applyMiddleware = (...middlewares) => store => {
     )
 }
 
+// 创建异步中间件
+const thunkMiddleware = ({dispatch, getState}) => next => action => {
+    if(typeof action === 'function') {
+        return action({dispatch, getState});
+    }
+    return next(action);
+}
+
 const store = createStore(reducer, applyMiddleware(
-    delayMiddleware,
+    // delayMiddleware,
+    thunkMiddleware,
     loggingMiddleware
 ));

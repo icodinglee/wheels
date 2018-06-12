@@ -1,5 +1,5 @@
 
-What I cannot create, I do not understand  -Richard Feynman
+##### What I cannot create, I do not understand  -Richard Feynman
 
 # wheels
 动手实现一些轮子
@@ -17,3 +17,4 @@ https://medium.com/@sweetpalma/gooact-react-in-160-lines-of-javascript-44e0742ad
     - reducer √
     - applyMiddleware √
     - middleware(delayMiddleware、loggingMiddleware) √
+    - 异步dispacth (thunkMiddleware)  √
