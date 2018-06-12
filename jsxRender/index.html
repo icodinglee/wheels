@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+</head>
+<body>
+    <script type="text/babel">
+
+            /** @jsx h */
+            // ^^^^ 这里告诉 babel转换器使用 h()方法来对每个节点进行转换 
+
+            const ITEMS = 'hello there people'.split(' ');
+
+            function foo(items) {
+                return items.map( p => <li> {p} </li> );	
+            }
+
+            // react中常用的jsx语法
+            let vdom = (
+                <div id="foo">
+                    <p>Look, a simple JSX DOM renderer!</p>
+                    <ul>{ foo(ITEMS) }</ul>
+                </div>
+            );
+
+            /** 把虚拟dom 转化为真实dom */
+            function render(vnode) {
+                if (typeof vnode==='string') return document.createTextNode(vnode);
+                let n = document.createElement(vnode.nodeName);
+                Object.keys(vnode.attributes || {}).forEach( k => n.setAttribute(k, vnode.attributes[k]) );
+                (vnode.children || []).forEach( c => n.appendChild(render(c)) );
+                return n;
+             }
+
+            // 把Virtual DOM壮话成一个真实的DOM树
+            let dom = render(vdom);
+
+            document.body.appendChild(dom);
+
+            let json = JSON.stringify(vdom, null, '  ');
+
+            // 整个流程 JSX -> VDOM -> DOM
+            document.body.appendChild(
+                render( <pre>{ json }</pre> )
+            );
+
+
+            /**  生成器, 在转换JSX时将会被调用 */
+            /**  返回的每个VNode都包含节点名称、 属性 、 子节点信息**/
+            function h(nodeName, attributes, ...args) {
+                let children = args.length ? [].concat(...args) : null;
+                return { nodeName, attributes, children };
+            }
+
+    </script>
+</body>
+</html>
