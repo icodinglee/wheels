@@ -1,5 +1,5 @@
 /**
- * @desc redux 内部简单实现
+ * @desc redux 内部简单实现 --- 发布订阅模式
  */
 
 //   <-----------------------一些公用方法------------------------->
@@ -147,16 +147,16 @@ const createStore = (reducer, middleware) => {
     let state = undefined;
     const subscribers = [];
     const coreDispatch = action => {
-        validateAction(action); // 类型检测
+        validateAction(action); // 类型安全检测
         state = reducer(state, action);
         subscribers.forEach(handler => handler());
     };
     const getState = () => state;
     let store = {
         dispatch: action => {
-            validateAction(action); 
+            validateAction(action);  //类型安全检测
             state = reducer(state, action);
-            subscribers.forEach(handler => handler());  // 执行订阅方法
+            subscribers.forEach(handler => handler());  // 数据更新时执行回调函数，触发connect组件中相关函数 !important
         },
         getState,
         subscribe: handler => {

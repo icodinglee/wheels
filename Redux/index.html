@@ -60,7 +60,7 @@
             componentWillMount(){
               const { store } = this.context;
               this.onStoreOrPropsChange(this.props);
-              this.unsubscribe = store.subscribe(() => this.onStoreOrPropsChange(this.props));
+              this.unsubscribe = store.subscribe(() => this.onStoreOrPropsChange(this.props));  // store中数据有变化时，将会触发这个函数,进而更新相关函数 !important
             }
 
             componentWillReceiveProps(nextProps){
