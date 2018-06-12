@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Hello World</title>
+    <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script src="./redux.js"></script>
+    <script type="text/babel">
+
+      const NoteEditor = ({note, onChangeNote, onCloseNote}) => (
+        <div>
+          <div>
+            <textarea
+              className="editor-content"
+              autoFocus
+              value={note.content}
+              onChange={event =>
+                onChangeNote(note.id, event.target.value)
+              }
+            />
+          </div>
+          <button className="editor-button" onClick={onCloseNote}>
+            Close
+          </button>
+        </div>
+      );
+      
+      const NoteTitle = ({note}) => {
+        const title = note.content.split('\n')[0].replace(/^\s+|\s+$/g, '');
+        if (title === '') {
+          return <i>Untitled</i>;
+        }
+        return <span>{title}</span>;
+      };
+      
+      const NoteLink = ({note, onOpenNote}) => (
+        <li className="note-list-item">
+          <a href="#" onClick={() => onOpenNote(note.id)}>
+            <NoteTitle note={note}/>
+          </a>
+        </li>
+      );
+      
+      const NoteList = ({notes, onOpenNote}) => (
+        <ul className="note-list">
+          {
+            Object.keys(notes).map(id =>
+              <NoteLink
+                key={id}
+                note={notes[id]}
+                onOpenNote={onOpenNote}
+              />
+            )
+          }
+        </ul>
+      );
+      
+      const NoteApp = ({
+        notes, openNoteId, onAddNote, onChangeNote,
+        onOpenNote, onCloseNote
+      }) => (
+        <div>
+          {
+            openNoteId ?
+              <NoteEditor
+                note={notes[openNoteId]}
+                onChangeNote={onChangeNote}
+                onCloseNote={onCloseNote}
+              /> :
+              <div>
+                <NoteList
+                  notes={notes}
+                  onOpenNote={onOpenNote}
+                />
+                {
+                  <button
+                    className="editor-button"
+                    onClick={onAddNote}
+                  >
+                    New Note
+                  </button>
+                }
+              </div>
+          }
+        </div>
+      );
+
+      class NoteAppContainer extends React.Component {
+        constructor(props) {
+            super(props);
+            this.state = props.store.getState();
+        }
+        componentWillMount() {
+            this.unsubscribe = this.props.store.subscribe(()=> 
+                this.setState(this.props.store.getState)
+            );
+        }
+        componentWillUnmount() {
+            this.unsubscribe()
+        }
+        onAddNote() {
+            this.props.store.dispatch({
+                type: CREATE_NOTE
+            })
+        }
+        onChangeNote(id, content) {
+           console.log(this);
+            this.props.store.dispatch({
+                type: UPDATE_NOTE,
+                id,
+                content
+            })
+        }
+        onOpenNote(id) {
+            this.props.store.dispatch({
+                type: OPEN_NOTE,
+                id
+            })
+        }
+        onCloseNote() {         
+            this.props.store.dispatch({
+                type: CLOSE_NOTE
+            })
+        }
+        render(){
+          return (
+                <NoteApp 
+                    {...this.state}
+                    onAddNote={this.onAddNote.bind(this)}
+                    onChangeNote={this.onChangeNote.bind(this)}
+                    onOpenNote={this.onOpenNote.bind(this)}
+                    onCloseNote={this.onCloseNote.bind(this)}
+                />
+          ) 
+        }
+      }
+
+
+      const renderApp = () => {
+            ReactDOM.render(
+                <NoteAppContainer store={store} />,
+                document.getElementById('root')
+            )
+      }
+
+      renderApp();
+
+    </script>
+  </body>
+</html>
