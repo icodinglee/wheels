@@ -188,7 +188,7 @@ const delayMiddleware = () => next => action => {
 }
 
 // 创建一个日志打印中间件
-const loggingMiddleware = ({getState}) => next => action => {
+const loggingMiddleware = ({ getState }) => next => action => {
     console.log('before', getState());
     console.info('action', action);
     const result = next(action);
@@ -204,7 +204,7 @@ const applyMiddleware = (...middlewares) => store => {
     if(middlewares.length === 1){
         return middlewares[0]
     }
-    const boundMiddlewares = middlewares.map(middleware=> 
+    const boundMiddlewares = middlewares.map( middleware => 
         middleware(store)
     );
     return boundMiddlewares.reduce((a, b)=>
@@ -213,7 +213,7 @@ const applyMiddleware = (...middlewares) => store => {
 }
 
 // 创建异步中间件
-const thunkMiddleware = ({dispatch, getState}) => next => action => {
+const thunkMiddleware = ({ dispatch, getState }) => next => action => {
     if(typeof action === 'function') {
         return action({dispatch, getState});
     }
