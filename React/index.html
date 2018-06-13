@@ -3,55 +3,44 @@
   <head>
     <meta charset="UTF-8" />
     <title>Hello World</title>
-    <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
   </head>
   <body>
     <div id="root"></div>
     <script type="text/babel">
+        /** @jsx createElement */
 
-        const initialState = {
-            nextNodeId: 1,
-            notes: {}
+
+        /**
+        * @desc 构造一个jsx渲染器， 把 <div></div>这种dom节点形式的的转化为 {type: 'div', props: { className: 'XXX}, children: []}这种json格式，便于处理
+        */
+        const  createElement = (type, props, ...children) => {
+            if(props === null) props = null;
+            return {type, props, children}
         }
-        window.state = initialState;
-        
-        const onAddNote = () =>{
-            const id = window.state.nextNodeId;
-            window.state.notes[id] = {
-                id: '',
-                content: ''
+
+        /**
+        *@desc render方法 将 vdom -> 转化为 dom
+        */
+        const render = (vdom, parent = null) => {
+            const mount = parent ? (el => parent.appendChild(el)) : (el => el);
+            if(typeof vdom === 'string' || typeof vdom === 'number') {
+                return  mount(document.createTextNode(vdom));
+            } else if (typeof vdom === 'boolean' || vdom === null) {
+                return mount(document.createTextNode(''));
+            } else if (typeof vdom === 'object' && typeof vdom.type === 'function') {
+                return Component.render(vdom, parent);
+            } else if (typeof vdom === 'object' && typeof vdom.type === 'string') {
+                const dom = mount(document.createElement(vdom.type));
+                for (const child of [/* flatten */].concat(...vdom.children))
+                    render(child, dom);
+                for (const prop in vdom.props)
+                    setAttribute(dom, prop, vdom.props[prop])
+                return dom;
+            } else {
+                throw new Error(`Invalid VDOM: ${vdom}.`)
             }
-            window.state.nextNodeId++;
-            renderApp();
         }
-
-        const NodeApp = ({Notes}) => (
-            <div>
-                <ul>
-                    {
-                        Object.keys(notes).map(id =>{
-                            <li className="note-list-item">{id}</li>
-                        })
-                    }
-                </ul>
-                <button className="edit-button" onClick={onAddNote}>new note</button>
-            </div>
-        )
-
-        const renderApp = () => {
-            ReactDOM.render(
-                <NodeApp notes={window.state.notes} />,
-                document.getElementById('root')
-            )
-        }
-     // <------------------------------split-line------------------------>
-    //   const content = <h1>Hello, world!</h1>;
-    //   ReactDOM.render(
-    //     content,
-    //     document.getElementById('root')
-    //   );
 
     </script>
   </body>

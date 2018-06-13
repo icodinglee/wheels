@@ -161,7 +161,7 @@ const createStore = (reducer, middleware) => {
         getState,
         subscribe: handler => {
             subscribers.push(handler);
-            return ()=> {   // 在这里可以取消订阅
+            return ()=> {   // 返回取消订阅方法
                 const index = subscribers.indexOf(handler);
                 if(index > 0) {
                     subscribers.splice(index, 1);
