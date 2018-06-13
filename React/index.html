@@ -41,7 +41,31 @@
                 throw new Error(`Invalid VDOM: ${vdom}.`)
             }
         }
+        
+        /**
+        * @desc 把vdom中的属性方法重新绑定到dom 中去
+        */
+        const setAttribute = (dom, key, value) => {
+            if(typeof value === 'function' && key.startWith('on')) {
+                const eventType = key.slice(2).toLowerCase();
+                dom.__tinyactHandlers = dom.__tinyactHandlers || {};
+                dom.removeEventListener(eventType, dom.__tinyactHandlers[eventType]);
+                dom.__tinyactHandlers[eventType] = value;
+                dom.addEventListener(eventType, dom.__tinyactHandlers[eventType]);
+            } else if (key === 'checked' || key === 'value' || key === 'className'){
+                dom[key] = value
+            } else if (key === 'style' || typeof value === 'object') {
+                object.assign(dom.style, value)
+            } else if (key === 'ref' && typeof value === 'function') {
+                value(dom)
+            } else if (key === 'key') {
+                dom.__tinyactKey = value;
+            } else if (typeof value !== 'object' && typeof value !== 'function') {
+                dom.setAttribute(key, value)
+            }
+        }
 
+        
     </script>
   </body>
 </html>
