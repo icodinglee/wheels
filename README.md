@@ -26,6 +26,8 @@
     - 异步dispacth (thunkMiddleware)  √
 
 #### 4.EventEmitter
+    - 运行在浏览器中，处理事件的订阅和发布
+    
 #### 5.ScrollToTop
 #### 6.Sticky
 #### 7.ProgressIndicator

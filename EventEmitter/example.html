@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <input type="button"  value="emit" id="add" />
+    <input type="button"  value="cancel" id="cancel" />
+    <script src="./eventEmitter.js"></script>
+    <script>
+        var emitter = new EventEmitter();
+      
+        // 注册事件
+        emitter.on('say', (data)=>{
+            console.log('hello');
+        });
+        emitter.once('say', (data)=>{
+            console.log(data);
+        });
+        
+        // 发布事件
+        document.getElementById('add').onclick = function(){
+            console.log(1);
+            emitter.emit('say', 'world', 'ppp');
+        }
+        
+        // 取消订阅
+        document.getElementById('cancel').onclick = function(){
+            console.log(emitter);
+            emitter.allOff('hello');
+        }
+
+    </script>
+</body>
+</html>
