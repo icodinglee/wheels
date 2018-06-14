@@ -3,7 +3,10 @@
 
 # wheels
 动手实现一些轮子
+
 #### 1. 动手实现JSX渲染器
+    - dom -> vdom —> dom  √
+
 #### 2. 构造一个简单的React  ---Tinyact
     - jsx解析 √
     - 生命周期 √
