@@ -2,13 +2,12 @@ import Tinyact, { render, Component } from "../tinyact";
 
 class Title extends Component {
   componentDidMount() {
-    console.log("title")
-    console.log(document.getElementById("title"))
+    console.log(this.props);
   }
 
   render() {
     return (
-      <h1 id="title">{this.props.children}</h1>
+      <h1 id="title"> {this.props.children}</h1>
     )
   }
 }
@@ -23,7 +22,7 @@ class App extends Component {
   }
 
   componentDidMount() {
-    console.log("app");
+    console.log(this.counter);
   }
 
   onIncrease() {
@@ -42,17 +41,16 @@ class App extends Component {
     const { counter } = this.state;
     return (
       <div>
-        <Title>Hello Tinyact!!!!</Title>
-        <p >
-          <button onClick={this.onDecrease}>-</button>
+        <Title data={'H-E-L-L-O'}>Tinyact</Title>
+        <p  ref={(counter) => this.counter = counter }>
+          <button onClick={this.onDecrease} style={{color: 'red'}}>-</button>
           {" "}Counter: {counter}{" "}
-          <button onClick={this.onIncrease}>+</button>
+          <button onClick={this.onIncrease} style={{color: 'blue'}}>+</button>
         </p>
       </div>
     );
   }
 }
 
-console.log(render);
 
 render(<App />, document.getElementById("root"));
