@@ -27,7 +27,12 @@
 
 #### 4.EventEmitter
     - 运行在浏览器中，处理事件的订阅和发布
-    
+    - on 订阅事件  √
+    - once 订阅事件，并只被触发一次  √
+    - emit 发布事件  √
+    - off  解除某个事件订阅  √
+    - allOff 解除指定事件类型下 所有事件的订阅  √
+
 #### 5.ScrollToTop
 #### 6.Sticky
 #### 7.ProgressIndicator
