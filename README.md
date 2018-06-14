@@ -4,8 +4,14 @@
 # wheels
 动手实现一些轮子
 #### 1. 动手实现JSX渲染器
-#### 2. 构造一个简单的React -Tinyact
-    - https://medium.com/@sweetpalma/gooact-react-in-160-lines-of-javascript-44e0742ad60f
+#### 2. 构造一个简单的React  ---Tinyact
+    - jsx解析 √
+    - 生命周期 √
+    - props √ 
+    - 事件绑定 √
+    - 样式绑定 √
+    - ref √
+    - diff 算法 √
 
 #### 3. 从零实现一个Redux
     - Store √

@@ -5,61 +5,61 @@
     /**
     * @desc 构造一个jsx渲染器， 把 <div></div>这种dom节点形式的的转化为 {type: 'div', props: { className: 'XXX}, children: []}这种json格式，便于处理
     */
-    const  createElement = (type, props, ...children) => {
-        if(props === null) props = null;
+    const  createElement = exports.createElement =  (type, props, ...children) => {
+        if(props === null) props = {};
         return {type, props, children}
     }
 
     /**
-    *@desc render方法 将 vdom -> 转化为 dom
+    * @desc render方法 将 vdom -> 转化为 dom
     */
-    const render = (vdom, parent = null) => {
+    const render = exports.render= (vdom, parent = null) => {
         const mount = parent ? (el => parent.appendChild(el)) : (el => el);
-        if(typeof vdom === 'string' || typeof vdom === 'number') {
-            return  mount(document.createTextNode(vdom));
-        } else if (typeof vdom === 'boolean' || vdom === null) {
+        if (typeof vdom == 'string' || typeof vdom == 'number') {
+            return mount(document.createTextNode(vdom));
+        } else if (typeof vdom == 'boolean' || vdom === null) {
             return mount(document.createTextNode(''));
-        } else if (typeof vdom === 'object' && typeof vdom.type === 'function') {
+        } else if (typeof vdom == 'object' && typeof vdom.type == 'function') {
             return Component.render(vdom, parent);
-        } else if (typeof vdom === 'object' && typeof vdom.type === 'string') {
+        } else if (typeof vdom == 'object' && typeof vdom.type == 'string') {
             const dom = mount(document.createElement(vdom.type));
             for (const child of [/* flatten */].concat(...vdom.children))
                 render(child, dom);
             for (const prop in vdom.props)
-                setAttribute(dom, prop, vdom.props[prop])
+                setAttribute(dom, prop, vdom.props[prop]);
             return dom;
         } else {
-            throw new Error(`Invalid VDOM: ${vdom}.`)
+            throw new Error(`Invalid VDOM: ${vdom}.`);
         }
     }
     
     /**
     * @desc 把vdom中的属性方法重新绑定到dom 中去
     */
-    const setAttribute = (dom, key, value) => {
-        if(typeof value === 'function' && key.startWith('on')) {
+    const setAttribute =  exports.setAttribute = (dom, key, value) => {
+        if (typeof value == 'function' && key.startsWith('on')) {
             const eventType = key.slice(2).toLowerCase();
             dom.__tinyactHandlers = dom.__tinyactHandlers || {};
             dom.removeEventListener(eventType, dom.__tinyactHandlers[eventType]);
             dom.__tinyactHandlers[eventType] = value;
             dom.addEventListener(eventType, dom.__tinyactHandlers[eventType]);
-        } else if (key === 'checked' || key === 'value' || key === 'className'){
-            dom[key] = value
-        } else if (key === 'style' || typeof value === 'object') {
-            object.assign(dom.style, value)
-        } else if (key === 'ref' && typeof value === 'function') {
-            value(dom)
-        } else if (key === 'key') {
+        } else if (key == 'checked' || key == 'value' || key == 'className') {
+            dom[key] = value;
+        } else if (key == 'style' && typeof value == 'object') {
+            Object.assign(dom.style, value);
+        } else if (key == 'ref' && typeof value == 'function') {
+            value(dom);
+        } else if (key == 'key') {
             dom.__tinyactKey = value;
-        } else if (typeof value !== 'object' && typeof value !== 'function') {
-            dom.setAttribute(key, value)
+        } else if (typeof value != 'object' && typeof value != 'function') {
+            dom.setAttribute(key, value);
         }
     }
 
     /**
      * @desc patch算法 新旧替换
      */
-    const patch = (dom, vdom, parent = dom.parentNode) => {
+    const patch = exports.patch = (dom, vdom, parent = dom.parentNode) => {
         const replace = parent ? el => (parent.replaceChild(el, dom) && el) : (el => el);
         if (typeof vdom == 'object' && typeof vdom.type == 'function') {
             return Component.patch(dom, vdom, parent);
@@ -172,5 +172,7 @@
     }
 
 
-
 })(typeof exports != 'undefined' ? exports : window.Tinyact = {});
+
+
+// <----参考 https://medium.com/@sweetpalma/gooact-react-in-160-lines-of-javascript-44e0742ad60f ---->
