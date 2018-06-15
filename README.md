@@ -34,9 +34,15 @@
     - allOff 解除指定事件类型下 所有事件的订阅  √
 
 #### 5.ScrollToTop
-#### 6.Sticky
+    - 【返回顶部】运行在移动端和pc, 支持ie7+  √
+    - 可控制 滚动多少距离时显示返回顶端元素  √
+    - 可控制 返回顶端速度   √
+    - 可控制 标记元素淡出速度  √
+
+#### 6.LazyLoad
+    - 【懒加载】运行在移动端和pc, 支持ie8+  √
+
 #### 7.ProgressIndicator
-#### 8.LazyLoad
 #### 9.Preload
 #### 10.PullToTopFresh
 #### 11.waterfall

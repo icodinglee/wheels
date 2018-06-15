@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<style>
+    #top{
+        position: fixed;
+        right: 40px;
+        bottom: 40px;
+        width:40px;
+        line-height: 40px;
+        background: red;
+        color: #ffffff;
+        text-align: center;
+        cursor: pointer;
+        user-select: none;
+    }
+    body{
+        height: 5000px;
+    }
+</style>
+<body>
+    <div id="top">TOP</div>
+    <script src="./ScrollToTop.js"></script>
+    <script>
+        var toTop = new ScrollToTop("#top", {
+            // 滚动条向下滑动多少时，出现回到顶部按钮
+            showWhen: 500,
+            // 回到顶部的速度。
+            speed: 50,
+            // 元素淡入和淡出的速度
+            fadeSpeed: 20
+        });
+    </script>
+</body>
+</html>
