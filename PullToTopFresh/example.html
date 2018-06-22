@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>下拉刷新</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" href="normalize.css">
+    <style>
+        .wrap {
+            padding: 0 10px 10px;
+        }
+        .refresh-element {
+            background-color: #1abc9c;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="wrap" class="wrap">
+        <p>使用下拉获取新内容</p>
+    </div>
+    <script src="./pulltorefresh.js"></script>
+    <script>
+    var pull = new PullToRefresh({
+        target: 'body',
+        onRefresh: function(reset) {
+            // 模拟加载事件，注意当加载事件完成后，调用 reset 函数以恢复位置
+            setTimeout(function() {
+                var p = document.createElement("p");
+                p.innerHTML = new Date().getTime() + " ---> this is new content";
+                document.getElementById("wrap").appendChild(p);
+                reset();
+            }, 500)
+        }
+    })
+    </script>
+</body>
+
+</html>

@@ -40,11 +40,15 @@
     - 可控制 标记元素淡出速度  √
 
 #### 6.LazyLoad
-    - 【懒加载】运行在移动端和pc, 支持ie8+  √
+    - 【图片懒加载】运行在移动端和pc, 支持ie8+  √
+    - 支持防抖，优化性能   √
 
-#### 7.ProgressIndicator
+#### 7.PullToTopFresh 
+    - 【移动端下拉刷新】  √
+
+#### 8.ProgressIndicator
 #### 9.Preload
-#### 10.PullToTopFresh
+
 #### 11.waterfall
 #### 12.AutoType
 #### 13.Pagination
